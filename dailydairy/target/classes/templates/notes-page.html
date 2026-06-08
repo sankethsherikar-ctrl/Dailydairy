@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Diary Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #5b0fbb, #1e60d5);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-bar h2 {
+            margin: 0;
+            color: #2575fc;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 30%;
+            min-width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            color: #2575fc;
+        }
+
+        .note-btn {
+            display: block;
+            background-color: #e0ecff;
+            color: #333;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+            text-decoration: none;
+        }
+
+        .note-btn:hover {
+            background-color: #31abe4;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        .note-image {
+            display: block;
+            margin: 20px auto;
+            width: 338px;
+            height: 306px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .label {
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2575fc;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ✅ Top header with username and logout -->
+<div class="top-bar">
+    <h2 th:text="${username} + '\'s Diary Notes'">Your Diary Notes</h2>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+</div>
+
+<!-- ✅ Main content area -->
+<div class="main-container">
+
+    <!-- ✅ Sidebar with notes -->
+    <div class="sidebar">
+        <a href="/notes/add" class="note-btn">+ Add New Note</a>
+        <input type="text" id="searchBox" placeholder="Search notes..." class="search-input" />
+
+        <div th:each="note : ${notes}">
+            <button type="button"
+                    th:text="${note.title} + ' (' + ${note.date} + ')'"
+                    th:attr="data-id=${note.id}"
+                    class="note-btn"></button>
+        </div>
+    </div>
+
+    <!-- ✅ Right content section -->
+    <div class="content" id="note-content">
+        <p>Select a note to view details.</p>
+    </div>
+
+</div>
+
+<!-- ✅ JavaScript to fetch and render note -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        const buttons = document.querySelectorAll(".note-btn[data-id]");
+        const noteArea = document.getElementById("note-content");
+        const searchBox = document.getElementById("searchBox");
+
+        searchBox.addEventListener("input", () => {
+            const filter = searchBox.value.toLowerCase();
+            buttons.forEach(btn => {
+                const text = btn.textContent.toLowerCase();
+                btn.style.display = text.includes(filter) ? "block" : "none";
+            });
+        });
+
+        buttons.forEach(button => {
+            button.addEventListener("click", () => {
+                const noteId = button.getAttribute("data-id");
+                fetch('/notes/api/notes/' + noteId)
+                    .then(res => res.json())
+                    .then(note => {
+                        if (note.error) {
+                            noteArea.innerHTML = `<p style="color:red;">${note.error}</p>`;
+                        } else {
+                            noteArea.innerHTML = `
+                                <div>
+                                    <div class="label">Day Spotlight:</div>
+                                    <h2>${note.title}</h2>
+
+                                    <div class="label">Date:</div>
+                                    <p>${note.date}</p>
+
+                                    ${note.image ? `<img class='note-image' src='data:image/jpeg;base64,${note.image}' />` : ""}
+
+                                    <div class="label">My Note:</div>
+                                    <p>${note.content}</p>
+                                </div>
+                            `;
+                        }
+                    });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

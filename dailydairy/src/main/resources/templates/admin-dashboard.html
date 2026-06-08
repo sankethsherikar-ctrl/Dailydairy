@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f4f6f8;
+        }
+
+        h2 {
+            color: #2575fc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2575fc;
+            color: white;
+        }
+
+        .btn-group {
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+        }
+
+        .add-btn {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+    <h2 th:text="'Welcome, ' + ${adminName} + '!'">Welcome, Admin!</h2>
+
+    <div class="btn-group">
+        <a th:href="@{/admin/add}" class="btn add-btn">Add New Admin</a>
+        <a th:href="@{/admin/logout}" class="btn logout-btn">Logout</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Notes Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="entry : ${userNotes}">
+                <td th:text="${entry.key}">Username</td>
+                <td th:text="${entry.value}">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
