@@ -1,1 +1,2 @@
 # Dailydairy
+Daily Dairy Web Application is a Spring Boot-based web platform that enables users to securely create, manage, and organize their daily diary notes. The application provides user registration and login, note creation, editing, deletion, and personal note management. It also includes an admin panel for monitoring users and diary activity. Built using Spring Boot, Spring Security, Thymeleaf, MySQL, HTML, CSS, and Java, the project focuses on secure authentication, user-friendly design, and efficient data management.
